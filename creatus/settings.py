@@ -16,15 +16,18 @@ SECRET_KEY = os.environ.get(
     'django-insecure-fallback-key-change-this'
 )
 
-# Debug - False on Vercel, True for local development
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+# DEBUG (safe for Vercel)
+DEBUG = os.environ.get('DEBUG', '0') == '1'
 
 
-# ✅ ALLOWED HOSTS (Vercel safe)
+# =========================
+# 🌍 ALLOWED HOSTS
+# =========================
 ALLOWED_HOSTS = [
-    '.vercel.app',
-    'localhost',
-    '127.0.0.1',
+    ".vercel.app",
+    "localhost",
+    "127.0.0.1",
+    os.environ.get("VERCEL_URL", "")
 ]
 
 
@@ -47,7 +50,8 @@ INSTALLED_APPS = [
 # =========================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',   # Must be right after SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -114,23 +118,38 @@ USE_TZ = True
 
 
 # =========================
-# 📁 STATIC FILES - Optimized for Vercel
+# 📁 STATIC FILES (Vercel + WhiteNoise)
 # =========================
 STATIC_URL = '/static/'
-
-# Where collectstatic will collect files
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Additional static directories
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-]
+] if (BASE_DIR / 'static').exists() else []
 
-# WhiteNoise Configuration (Important for Vercel)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# WhiteNoise storage (production ready)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 
 # =========================
 # 🔐 DEFAULT PRIMARY KEY
 # =========================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# =========================
+# 🔒 SECURITY (PRODUCTION ONLY)
+# =========================
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
