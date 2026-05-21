@@ -1,5 +1,24 @@
+# Django
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
 db.sqlite3
-venv/
+db.sqlite3-journal
+
+# Static files collected
+staticfiles/
+
+# Environment variables
 .env
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
