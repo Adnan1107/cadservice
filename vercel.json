@@ -1,5 +1,9 @@
 {
   "version": 2,
+  "buildCommand": "python manage.py collectstatic --noinput",
+  "outputDirectory": "staticfiles",
+  "installCommand": "pip install -r requirements.txt",
+  "framework": "django",
   "builds": [
     {
       "src": "creatus/wsgi.py",
