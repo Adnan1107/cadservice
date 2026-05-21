@@ -10,7 +10,9 @@ SECRET_KEY = 'django-insecure-d0cghkr!u)a_r%zfudvt5_p3o--a&263y71lvpfjr+*l9xdzn=
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ✅ For deployment (Vercel / Render / etc.)
+ALLOWED_HOSTS = ['*']   # later replace with your real domain
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -24,6 +26,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ added for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -51,6 +54,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'creatus.wsgi.application'
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -70,6 +74,12 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ✅ STATIC FILES — FIXED
+
+# =========================
+# ✅ STATIC FILES (VERCEL FIX)
+# =========================
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']  # ✅ points to static/ folder
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
