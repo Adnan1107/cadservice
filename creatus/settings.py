@@ -3,17 +3,34 @@ Django settings for creatus project.
 """
 
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-d0cghkr!u)a_r%zfudvt5_p3o--a&263y71lvpfjr+*l9xdzn='
 
-DEBUG = True
+# =========================
+# 🔐 SECURITY
+# =========================
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-fallback-key-change-this'
+)
 
-# ✅ For deployment (Vercel / Render / etc.)
-ALLOWED_HOSTS = ['*']   # later replace with your real domain
+# Debug - False on Vercel, True for local development
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 
+# ✅ ALLOWED HOSTS (Vercel safe)
+ALLOWED_HOSTS = [
+    '.vercel.app',
+    'localhost',
+    '127.0.0.1',
+]
+
+
+# =========================
+# 📦 INSTALLED APPS
+# =========================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,9 +41,13 @@ INSTALLED_APPS = [
     'home',
 ]
 
+
+# =========================
+# ⚙️ MIDDLEWARE
+# =========================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ added for static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # Must be right after SecurityMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -35,8 +56,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'creatus.urls'
 
+
+# =========================
+# 🧩 TEMPLATES
+# =========================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -52,9 +78,13 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'creatus.wsgi.application'
 
 
+# =========================
+# 🗄 DATABASE
+# =========================
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -62,6 +92,10 @@ DATABASES = {
     }
 }
 
+
+# =========================
+# 🔒 PASSWORD VALIDATION
+# =========================
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -69,6 +103,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+
+# =========================
+# 🌍 INTERNATIONALIZATION
+# =========================
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -76,10 +114,23 @@ USE_TZ = True
 
 
 # =========================
-# ✅ STATIC FILES (VERCEL FIX)
+# 📁 STATIC FILES - Optimized for Vercel
 # =========================
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Where collectstatic will collect files
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Additional static directories
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# WhiteNoise Configuration (Important for Vercel)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# =========================
+# 🔐 DEFAULT PRIMARY KEY
+# =========================
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
